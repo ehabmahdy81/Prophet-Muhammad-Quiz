@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>رحلة مع النبي ﷺ - لعبة تعليمية</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f9f3e8;
+    --beige: #ede0c8;
+    --beige-dark: #d4c4a0;
+    --gold: #c4a25e;
+    --gold-dark: #a0844a;
+    --gold-light: #e8d49e;
+    --brown: #5a4028;
+    --brown-light: #7a5c3a;
+    --text: #3a2a14;
+    --text-light: #6b5030;
+    --white: #fffef8;
+    --shadow: rgba(90,64,40,0.18);
+    --success: #4a8a5a;
+    --error: #8a3a2a;
+    --success-bg: #e8f5ec;
+    --error-bg: #f9e8e4;
+    --star-gold: #e8a020;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Naskh Arabic', 'Amiri', serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(196,162,94,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(196,162,94,0.06) 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cpath d='M40 0 L80 40 L40 80 L0 40 Z' fill='%23c4a25e' fill-opacity='0.03'/%3E%3Ccircle cx='40' cy='40' r='8' fill='%23c4a25e' fill-opacity='0.025'/%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    background: linear-gradient(135deg, var(--brown) 0%, #3a2410 50%, var(--brown-light) 100%);
+    color: var(--gold-light);
+    text-align: center;
+    padding: 1.5rem 1rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 20px var(--shadow);
+  }
+  .header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5 L55 30 L30 55 L5 30Z' fill='none' stroke='%23c4a25e' stroke-width='0.5' stroke-opacity='0.2'/%3E%3C/svg%3E");
+    opacity: 0.5;
+  }
+  .header-inner { position: relative; z-index: 1; }
+  .header h1 {
+    font-family: 'Amiri', serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 700;
+    color: var(--gold-light);
+    text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    letter-spacing: 0.02em;
+  }
+  .header p {
+    font-size: clamp(0.85rem, 2vw, 1rem);
+    color: var(--beige);
+    margin-top: 0.35rem;
+    opacity: 0.9;
+  }
+  .header-stars {
+    color: var(--star-gold);
+    font-size: 1rem;
+    letter-spacing: 6px;
+    margin-bottom: 0.5rem;
+  }
+
+  /* ===== PROGRESS BAR ===== */
+  .progress-bar-wrap {
+    background: var(--beige);
+    padding: 0.6rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: 2px solid var(--beige-dark);
+    flex-wrap: wrap;
+  }
+  .progress-label { font-size: 0.82rem; color: var(--text-light); font-weight: 600; white-space: nowrap; }
+  .progress-track {
+    flex: 1;
+    height: 10px;
+    background: var(--beige-dark);
+    border-radius: 99px;
+    overflow: hidden;
+    min-width: 80px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 100%);
+    border-radius: 99px;
+    transition: width 0.5s ease;
+  }
+  .score-badge {
+    background: var(--brown);
+    color: var(--gold-light);
+    padding: 0.3rem 0.9rem;
+    border-radius: 99px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  /* ===== MAIN LAYOUT ===== */
+  .main { max-width: 900px; margin: 0 auto; padding: 1.5rem 1rem; }
+
+  /* ===== SCREEN VIEWS ===== */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ===== EPISODE SELECT SCREEN ===== */
+  .episodes-title {
+    text-align: center;
+    font-family: 'Amiri', serif;
+    font-size: 1.5rem;
+    color: var(--brown);
+    margin-bottom: 0.4rem;
+  }
+  .episodes-subtitle {
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+  }
+  .episodes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+  .episode-card {
+    background: var(--white);
+    border: 2px solid var(--beige-dark);
+    border-radius: 16px;
+    padding: 1.1rem 1rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .episode-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+    transform-origin: right;
+  }
+  .episode-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px var(--shadow); border-color: var(--gold); }
+  .episode-card:hover::before { transform: scaleX(1); }
+  .episode-card.completed { border-color: var(--gold); }
+  .episode-card.completed::before { transform: scaleX(1); }
+  .ep-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+  .ep-num { font-size: 0.75rem; color: var(--text-light); font-weight: 600; }
+  .ep-title { font-family: 'Amiri', serif; font-size: 1.1rem; color: var(--brown); font-weight: 700; margin: 0.2rem 0; }
+  .ep-desc { font-size: 0.8rem; color: var(--text-light); line-height: 1.5; }
+  .ep-stars { margin-top: 0.6rem; color: var(--beige-dark); font-size: 1rem; letter-spacing: 3px; }
+  .ep-stars.earned { color: var(--star-gold); }
+  .ep-count { font-size: 0.75rem; color: var(--text-light); margin-top: 0.3rem; }
+
+  /* ===== GAME SCREEN ===== */
+  .game-header {
+    background: var(--white);
+    border: 2px solid var(--beige-dark);
+    border-radius: 16px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .game-episode-title { font-family: 'Amiri', serif; font-size: 1.3rem; color: var(--brown); }
+  .game-episode-sub { font-size: 0.8rem; color: var(--text-light); }
+  .game-question-counter {
+    background: var(--beige);
+    border-radius: 99px;
+    padding: 0.35rem 1rem;
+    font-size: 0.85rem;
+    color: var(--brown);
+    font-weight: 600;
+  }
+
+  .question-card {
+    background: var(--white);
+    border: 2px solid var(--beige-dark);
+    border-radius: 20px;
+    padding: 1.8rem 1.5rem;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 2px 12px var(--shadow);
+    animation: slideIn 0.3s ease;
+  }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .question-text {
+    font-family: 'Amiri', serif;
+    font-size: clamp(1.05rem, 2.5vw, 1.3rem);
+    color: var(--brown);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    line-height: 1.7;
+    text-align: center;
+  }
+
+  /* ===== DRAG DROP ZONE ===== */
+  .drag-answer-zone {
+    border: 3px dashed var(--beige-dark);
+    border-radius: 14px;
+    padding: 1.2rem;
+    min-height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    transition: all 0.25s ease;
+    background: var(--cream);
+    position: relative;
+  }
+  .drag-answer-zone.drag-over {
+    border-color: var(--gold);
+    background: rgba(196,162,94,0.08);
+    transform: scale(1.01);
+  }
+  .drag-answer-zone.has-answer {
+    border-style: solid;
+    border-color: var(--gold);
+    background: var(--beige);
+  }
+  .drag-answer-zone.correct {
+    border-color: var(--success);
+    background: var(--success-bg);
+  }
+  .drag-answer-zone.incorrect {
+    border-color: var(--error);
+    background: var(--error-bg);
+  }
+  .drop-placeholder {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    opacity: 0.7;
+    pointer-events: none;
+  }
+  .drop-label {
+    position: absolute;
+    top: -11px;
+    right: 16px;
+    background: var(--white);
+    color: var(--gold-dark);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0 8px;
+    border: 1.5px solid var(--beige-dark);
+    border-radius: 99px;
+  }
+  .answer-in-zone {
+    font-family: 'Amiri', serif;
+    font-size: 1.05rem;
+    color: var(--brown);
+    font-weight: 600;
+    padding: 0.6rem 1.2rem;
+    background: var(--white);
+    border: 2px solid var(--gold);
+    border-radius: 10px;
+    cursor: grab;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .answer-in-zone .remove-btn {
+    font-size: 0.7rem;
+    color: var(--text-light);
+    cursor: pointer;
+    opacity: 0.6;
+    border: none;
+    background: none;
+    padding: 0 3px;
+  }
+  .answer-in-zone .remove-btn:hover { opacity: 1; }
+
+  .options-label {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    font-weight: 600;
+    margin-bottom: 0.7rem;
+    text-align: center;
+  }
+  .options-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    justify-content: center;
+  }
+  .option-chip {
+    background: var(--beige);
+    border: 2px solid var(--beige-dark);
+    border-radius: 10px;
+    padding: 0.6rem 1.1rem;
+    font-family: 'Amiri', serif;
+    font-size: 0.95rem;
+    color: var(--brown);
+    cursor: grab;
+    transition: all 0.2s ease;
+    user-select: none;
+    touch-action: none;
+  }
+  .option-chip:hover { border-color: var(--gold); background: var(--gold-light); transform: scale(1.03); }
+  .option-chip.dragging { opacity: 0.4; transform: scale(0.97); }
+  .option-chip.used { opacity: 0.2; pointer-events: none; text-decoration: line-through; }
+  .option-chip.correct-option { border-color: var(--success); background: var(--success-bg); color: var(--success); }
+  .option-chip.wrong-option { border-color: var(--error); background: var(--error-bg); color: var(--error); }
+
+  /* ===== FEEDBACK ===== */
+  .feedback-box {
+    border-radius: 14px;
+    padding: 1rem 1.3rem;
+    margin-top: 1rem;
+    display: none;
+    animation: fadeIn 0.3s ease;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .feedback-box.correct-fb { background: var(--success-bg); border: 2px solid var(--success); color: #2a5a38; }
+  .feedback-box.incorrect-fb { background: var(--error-bg); border: 2px solid var(--error); color: #6a2218; }
+  .feedback-icon { font-size: 1.4rem; margin-bottom: 0.3rem; }
+  .feedback-explanation { font-size: 0.88rem; opacity: 0.85; margin-top: 0.4rem; }
+
+  /* ===== BUTTONS ===== */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.5rem;
+    border-radius: 10px;
+    font-family: 'Noto Naskh Arabic', serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+    color: var(--white);
+    box-shadow: 0 3px 10px rgba(160,132,74,0.35);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(160,132,74,0.45); }
+  .btn-secondary {
+    background: var(--beige);
+    color: var(--brown);
+    border: 2px solid var(--beige-dark);
+  }
+  .btn-secondary:hover { border-color: var(--gold); background: var(--gold-light); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+  .game-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.2rem;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+  }
+
+  /* ===== RESULT SCREEN ===== */
+  .result-card {
+    background: var(--white);
+    border: 2px solid var(--beige-dark);
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    box-shadow: 0 4px 20px var(--shadow);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  .result-trophy { font-size: 4rem; margin-bottom: 1rem; }
+  .result-title { font-family: 'Amiri', serif; font-size: 1.8rem; color: var(--brown); margin-bottom: 0.5rem; }
+  .result-score { font-size: 3rem; color: var(--gold-dark); font-weight: 700; margin: 0.5rem 0; }
+  .result-stars { font-size: 2rem; color: var(--star-gold); letter-spacing: 8px; margin: 0.5rem 0; }
+  .result-message { color: var(--text-light); font-size: 1rem; line-height: 1.6; margin: 1rem 0; }
+  .result-lesson {
+    background: var(--beige);
+    border-right: 4px solid var(--gold);
+    border-radius: 10px;
+    padding: 1rem;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+    color: var(--brown-light);
+    text-align: right;
+    line-height: 1.7;
+  }
+  .result-actions { display: flex; gap: 0.7rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem; }
+
+  /* ===== OVERALL RESULT ===== */
+  .overall-result {
+    background: linear-gradient(135deg, var(--brown), #3a2410);
+    color: var(--gold-light);
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  .overall-result h2 { font-family: 'Amiri', serif; font-size: 1.8rem; margin-bottom: 1rem; }
+  .overall-stats { display: flex; justify-content: center; gap: 2rem; margin: 1.5rem 0; flex-wrap: wrap; }
+  .stat-box { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 1rem 1.5rem; min-width: 100px; }
+  .stat-num { font-size: 2rem; font-weight: 700; color: var(--gold-light); }
+  .stat-label { font-size: 0.8rem; color: var(--beige); margin-top: 0.2rem; }
+
+  /* ===== DIVIDER ===== */
+  .ornament {
+    text-align: center;
+    color: var(--beige-dark);
+    margin: 1rem 0;
+    font-size: 1.2rem;
+    letter-spacing: 8px;
+  }
+
+  /* ===== BACK BUTTON ===== */
+  .back-row {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 1.2rem;
+  }
+
+  /* ===== TOUCH GHOST ===== */
+  .touch-ghost {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    opacity: 0.85;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 540px) {
+    .episodes-grid { grid-template-columns: repeat(2, 1fr); }
+    .game-actions { flex-direction: column; }
+    .game-actions .btn { width: 100%; justify-content: center; }
+  }
+
+  /* ===== CONFETTI ===== */
+  .confetti-container {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 9000;
+    overflow: hidden;
+  }
+  .confetti-piece {
+    position: absolute;
+    width: 10px; height: 10px;
+    animation: confettiFall 1.5s ease-in forwards;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* ===== STARS ANIMATION ===== */
+  .star-pop {
+    display: inline-block;
+    animation: starPop 0.4s ease forwards;
+  }
+  @keyframes starPop {
+    0% { transform: scale(0); }
+    60% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-inner">
+    <div class="header-stars">✦ ✦ ✦</div>
+    <h1>رحلة مع النبي ﷺ</h1>
+    <p>اختبر معلوماتك عن سيرة خير البشر محمد ﷺ</p>
+  </div>
+</div>
+
+<!-- Progress Bar -->
+<div class="progress-bar-wrap">
+  <span class="progress-label" id="progressLabel">الحلقات المكتملة: 0 / 15</span>
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+  <div class="score-badge" id="totalScore">⭐ 0 نقطة</div>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- SCREEN 1: Episode Selection -->
+  <div class="screen active" id="screenEpisodes">
+    <div class="ornament">❖ ❖ ❖</div>
+    <h2 class="episodes-title">اختر الحلقة</h2>
+    <p class="episodes-subtitle">استمع للحلقة أولاً، ثم اجب على الأسئلة بسحب الإجابة الصحيحة!</p>
+    <div class="episodes-grid" id="episodesGrid"></div>
+  </div>
+
+  <!-- SCREEN 2: Game -->
+  <div class="screen" id="screenGame">
+    <div class="back-row">
+      <button class="btn btn-secondary" onclick="goToEpisodes()">← العودة للحلقات</button>
+    </div>
+    <div class="game-header">
+      <div>
+        <div class="game-episode-sub" id="gameEpisodeSub"></div>
+        <div class="game-episode-title" id="gameEpisodeTitle"></div>
+      </div>
+      <div class="game-question-counter" id="questionCounter">السؤال 1 من 5</div>
+    </div>
+
+    <div class="question-card" id="questionCard">
+      <div class="question-text" id="questionText"></div>
+
+      <!-- Drop Zone -->
+      <div class="drag-answer-zone" id="dropZone">
+        <span class="drop-label">إجابتك</span>
+        <span class="drop-placeholder" id="dropPlaceholder">🖱️ اسحب إجابتك وضعها هنا</span>
+      </div>
+
+      <!-- Options -->
+      <div class="options-label">الاختيارات – اسحب الإجابة الصحيحة</div>
+      <div class="options-grid" id="optionsGrid"></div>
+
+      <!-- Feedback -->
+      <div class="feedback-box" id="feedbackBox">
+        <div class="feedback-icon" id="feedbackIcon"></div>
+        <div id="feedbackText"></div>
+        <div class="feedback-explanation" id="feedbackExp"></div>
+      </div>
+    </div>
+
+    <div class="game-actions">
+      <button class="btn btn-secondary" id="btnCheck" onclick="checkAnswer()">✔ تحقق من الإجابة</button>
+      <button class="btn btn-primary" id="btnNext" onclick="nextQuestion()" disabled>التالي ←</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: Episode Result -->
+  <div class="screen" id="screenResult">
+    <div class="result-card">
+      <div class="result-trophy" id="resultTrophy"></div>
+      <div class="result-title" id="resultTitle"></div>
+      <div class="result-score" id="resultScore"></div>
+      <div class="result-stars" id="resultStars"></div>
+      <div class="result-message" id="resultMessage"></div>
+      <div class="result-lesson" id="resultLesson"></div>
+      <div class="result-actions">
+        <button class="btn btn-secondary" onclick="retryEpisode()">🔄 إعادة المحاولة</button>
+        <button class="btn btn-primary" onclick="goToEpisodes()">📚 حلقات أخرى</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Touch Ghost -->
+<div class="touch-ghost" id="touchGhost" style="display:none"></div>
+<!-- Confetti Container -->
+<div class="confetti-container" id="confettiContainer"></div>
+
+<script>
+// ========== EPISODE DATA ==========
+const EPISODES = [
+  { id:1, title:"مولد النور", subtitle:"الحلقة الأولى", icon:"⭐", color:"#c4a25e",
+    description:"ولادة النبي محمد ﷺ في عام الفيل",
+    lesson:"الله يحفظ من يشاء • البركة في الإحسان • كل شيء بقدر الله",
+    questions:[
+      { q:"في أي عام وُلد النبي محمد ﷺ؟", opts:["عام الفيل","عام الهجرة","عام الغزو","عام البعثة"], ans:"عام الفيل", exp:"وُلد النبي ﷺ في عام 570م المعروف بعام الفيل، لأن أبرهة جاء بجيش وفيلة لهدم الكعبة فأهلكه الله." },
+      { q:"من كانت مرضعة النبي ﷺ التي أكرمها الله بالبركة؟", opts:["حليمة السعدية","آمنة بنت وهب","أم أيمن","ماشطة قريش"], ans:"حليمة السعدية", exp:"حليمة اختارت اليتيم عندما رفضه الجميع فباركها الله في ناقتها وشاتها وأرضها." },
+      { q:"ماذا فعل جده عبد المطلب فرحاً بمولده؟", opts:["دخل به الكعبة شاكراً الله","أولم وليمة كبيرة","سمّاه أحمد","أهدى الفقراء"], ans:"دخل به الكعبة شاكراً الله", exp:"فرح جده فرحاً عظيماً وحمل الطفل ودخل به الكعبة شاكراً الله وسمّاه محمداً." },
+      { q:"لماذا سُمّي عام الميلاد بـ'عام الفيل'؟", opts:["لأن أبرهة أتى بفيلة لهدم الكعبة","لأن الفيلة كانت تسكن مكة","لأن قريشاً امتلكت فيلة","لأن حرباً بسبب فيل وقعت"], ans:"لأن أبرهة أتى بفيلة لهدم الكعبة", exp:"أبرهة الحبشي قاد جيشاً بفيلة لهدم الكعبة فأرسل الله طيور أبابيل ودمّرت الجيش." },
+      { q:"ما الدرس المستفاد من اختيار حليمة لليتيم؟", opts:["البركة في الإحسان","اليتيم أفضل من غيره","الفقر سبب التعقل","الهواء النقي يُعلّم العربية"], ans:"البركة في الإحسان", exp:"الإحسان يجلب بركة الله، فحليمة أحسنت فأكرمها الله بأرزاق وفيرة." }
+    ]
+  },
+  { id:2, title:"الطفولة اليتيمة", subtitle:"الحلقة الثانية", icon:"🌙", color:"#8b7355",
+    description:"حادثة شق الصدر ورعاية الجد والعم",
+    lesson:"الله لا يترك عباده • الصبر على المصائب • البركة في الإنسان الصالح",
+    questions:[
+      { q:"من تولى رعاية النبي ﷺ بعد وفاة والدته آمنة؟", opts:["جده عبد المطلب","عمه أبو طالب","أبو بكر الصديق","عم آخر"], ans:"جده عبد المطلب", exp:"بعد وفاة والدته وهو في السادسة، تولى رعايته جده عبد المطلب الذي أحبه حباً شديداً." },
+      { q:"كم كان عمر النبي ﷺ حين توفيت والدته آمنة؟", opts:["ست سنوات","ثماني سنوات","عشر سنوات","اثنتا عشرة سنة"], ans:"ست سنوات", exp:"توفيت آمنة بنت وهب في مكان يُسمى الأبواء والنبي ﷺ ابن ست سنوات فقط." },
+      { q:"من رعى النبي ﷺ بعد وفاة جده عبد المطلب؟", opts:["عمه أبو طالب","أبو بكر الصديق","عمه حمزة","أحد أقاربه"], ans:"عمه أبو طالب", exp:"أوصى عبد المطلب قبيل وفاته ابنَه أبا طالب برعاية محمد ﷺ فأحبه حباً شديداً." },
+      { q:"ما الأمر العجيب الذي حدث لحليمة منذ أخذت محمداً ﷺ؟", opts:["أصبحت أرضها خضراء وشاتها تدر حليباً","أصبحت غنية فجأة","أصبح زوجها قوياً","وجدت ذهباً في بيتها"], ans:"أصبحت أرضها خضراء وشاتها تدر حليباً", exp:"منذ أن أخذت محمداً ﷺ، فاضت الخيرات؛ الشاة العجفاء صارت تدر حليباً والأرض القاحلة أصبحت خضراء." }
+    ]
+  },
+  { id:3, title:"الشاب الأمين", subtitle:"الحلقة الثالثة", icon:"⚖️", color:"#7a6840",
+    description:"شهادة بحيرى الراهب وحلف الفضول",
+    lesson:"الصدق والأمانة أساس النجاح • نصرة المظلوم واجب • السمعة الطيبة نعمة",
+    questions:[
+      { q:"بأي لقب عُرف النبي ﷺ في شبابه قبل نبوته؟", opts:["الصادق الأمين","القوي الشجاع","العالم الحكيم","الشريف الكريم"], ans:"الصادق الأمين", exp:"اشتهر النبي ﷺ بلقب الصادق الأمين حتى أن أعداءه لم يجدوا في سيرته عيباً واحداً." },
+      { q:"ما هو 'حلف الفضول' الذي شارك فيه النبي ﷺ؟", opts:["تعاهد لنصرة المظلوم ورد الحقوق","تعاهد لمحاربة الأعداء","اتفاق للتجارة بين القبائل","ميثاق لحماية الكعبة"], ans:"تعاهد لنصرة المظلوم ورد الحقوق", exp:"اجتمعت قبائل قريش وتعاهدوا على أن يكونوا مع المظلوم على الظالم حتى يؤدى الحق." },
+      { q:"ماذا رأى بحيرى الراهب عند مرور القافلة مع محمد ﷺ؟", opts:["غمامة تظلله وتسير معه","نوراً عظيماً يخرج منه","حيوانات تتبعه","ملائكة تحرسه"], ans:"غمامة تظلله وتسير معه", exp:"رأى بحيرى سحابة تظلل محمداً ﷺ تحديداً وتسير معه أينما سار، فدعا القافلة وعرّفه بعلامات النبوة." }
+    ]
+  },
+  { id:4, title:"زواج السيدة خديجة", subtitle:"الحلقة الرابعة", icon:"💎", color:"#9b7653",
+    description:"أمانة محمد ﷺ في التجارة وزواجه المبارك من خديجة",
+    lesson:"الأمانة والصدق سبب للبركة • المرأة الصالحة نعمة • الوفاء من الأخلاق العظيمة",
+    questions:[
+      { q:"كم كان عمر النبي ﷺ عند زواجه من خديجة؟", opts:["خمس وعشرون سنة","ثلاثون سنة","عشرون سنة","خمس وثلاثون سنة"], ans:"خمس وعشرون سنة", exp:"كان النبي ﷺ في الخامسة والعشرين من عمره يوم زواجه المبارك من خديجة رضي الله عنها." },
+      { q:"ما الذي لاحظه غلام خديجة ميسرة أثناء رحلة التجارة؟", opts:["ملكان يظللانه وأرباح ضخمة","رياح تساعده وتدفع بضاعته","قبائل تنضم إليه تلقائياً","نجوم تهديه في الليل"], ans:"ملكان يظللانه وأرباح ضخمة", exp:"رأى ميسرة ملكين يظللان محمداً ﷺ من الشمس وربحت التجارة ربحاً لم تربحه من قبل." },
+      { q:"كيف أظهر النبي ﷺ وفاءه لخديجة بعد وفاتها؟", opts:["ظل يذكرها بالخير ويكرم صديقاتها","نسيها بعد زواجه من عائشة","حافظ على أموالها لأبنائها","بنى لها مسجداً تذكاراً"], ans:"ظل يذكرها بالخير ويكرم صديقاتها", exp:"ظل النبي ﷺ يذكر خديجة بالخير دائماً ويكرم صديقاتها ويذبح الشاة ويهديها لهن." }
+    ]
+  },
+  { id:5, title:"بناء الكعبة والتحكيم", subtitle:"الحلقة الخامسة", icon:"🕋", color:"#6b5a3e",
+    description:"حكمة النبي ﷺ في حل نزاع الحجر الأسود",
+    lesson:"الحكمة في حل المشاكل • السمعة الطيبة نعمة • العدل والإنصاف للجميع",
+    questions:[
+      { q:"ما الحل الذكي الذي ابتكره النبي ﷺ لوضع الحجر الأسود؟", opts:["وضعه في ثوب ورفعته القبائل معاً","أقرع بين القبائل","وضعه وحده دون أن يخبر أحداً","طلب من أكبرهم سناً وضعه"], ans:"وضعه في ثوب ورفعته القبائل معاً", exp:"طلب ثوباً ووضع الحجر في وسطه وطلب من ممثل كل قبيلة أن يمسك طرفاً فرُفع الحجر معاً." },
+      { q:"لماذا اختارت قريش محمداً ﷺ حكَماً بينها؟", opts:["لأمانته وسمعته الطيبة","لأنه كان الأكبر سناً","لأنه كان الأقوى","لأن جده عبد المطلب طلب ذلك"], ans:"لأمانته وسمعته الطيبة", exp:"لما رأوه أول داخل قالوا: هذا الأمين! رضينا! هكذا كانت سمعته ﷺ قبل النبوة." }
+    ]
+  },
+  { id:6, title:"نزول الوحي", subtitle:"الحلقة السادسة", icon:"📖", color:"#5a4a32",
+    description:"أول آيات القرآن في غار حراء وتثبيت خديجة للنبي ﷺ",
+    lesson:"الخلوة والتفكر مهمة • دور الزوجة الصالحة • نزول القرآن معجزة عظيمة",
+    questions:[
+      { q:"أين كان النبي ﷺ عندما نزل عليه الوحي أول مرة؟", opts:["غار حراء في جبل النور","غار ثور جنوب مكة","المسجد الحرام","جبل الصفا"], ans:"غار حراء في جبل النور", exp:"كان النبي ﷺ في غار حراء يتعبد ويتفكر عندما ظهر له جبريل عليه السلام." },
+      { q:"ما أول كلمة نزل بها الوحي على النبي ﷺ؟", opts:["اقرأ","قُل","سبّح","آمن"], ans:"اقرأ", exp:"كانت أول آية: اقرأ باسم ربك الذي خلق، وهذا يدل على أهمية العلم في الإسلام." },
+      { q:"بماذا طمأنت خديجة رضي الله عنها النبي ﷺ حين عاد خائفاً؟", opts:["بذكر أخلاقه الحسنة وأن الله لن يخزيه","بقراءة الكتب السماوية عليه","بأخذه إلى كاهن","بطلب الدعاء من الصالحين"], ans:"بذكر أخلاقه الحسنة وأن الله لن يخزيه", exp:"قالت: إنك لتصل الرحم وتحمل الكل وتكسب المعدوم... والله لا يخزيك أبداً." }
+    ]
+  },
+  { id:7, title:"بداية الدعوة السرية", subtitle:"الحلقة السابعة", icon:"🌟", color:"#8b6914",
+    description:"أوائل المسلمين وقصة إسلام عمر رضي الله عنه",
+    lesson:"السبق في الخير فضل عظيم • القرآن يغير القلوب • الشجاعة في الحق",
+    questions:[
+      { q:"من كانت أول من آمن بالنبي ﷺ من النساء؟", opts:["خديجة رضي الله عنها","فاطمة الزهراء","عائشة رضي الله عنها","أسماء بنت أبي بكر"], ans:"خديجة رضي الله عنها", exp:"خديجة صدّقته فوراً ولم تتردد لحظة واحدة وكانت أول من آمن من النساء." },
+      { q:"ماذا حدث لعمر بن الخطاب عندما قرأ سورة طه؟", opts:["تغيّر قلبه وأسلم فوراً","مزّق الصحيفة غضباً","ازداد عداوة للإسلام","أسلم بعد تفكير طويل"], ans:"تغيّر قلبه وأسلم فوراً", exp:"قرأ عمر سورة طه فقال: ما أحسن هذا الكلام وأكرمه! دلوني على محمد! وأسلم." },
+      { q:"أين كان المسلمون الأوائل يجتمعون سراً لتعلم القرآن؟", opts:["دار الأرقم بن أبي الأرقم","بيت خديجة","غار حراء","مكان قرب الكعبة"], ans:"دار الأرقم بن أبي الأرقم", exp:"دار الأرقم كانت مقراً سرياً للمسلمين يتعلمون فيه القرآن بعيداً عن أعين قريش." }
+    ]
+  },
+  { id:8, title:"الإيذاء والثبات", subtitle:"الحلقة الثامنة", icon:"💪", color:"#7a5c3a",
+    description:"صبر الصحابة على التعذيب في سبيل الله",
+    lesson:"الثبات على الحق • الصبر على الأذى احتساباً • نصرة المظلوم فريضة",
+    questions:[
+      { q:"ماذا كان يقول بلال رضي الله عنه وهو يُعذَّب في الرمال الحارة؟", opts:["أحد... أحد","لا إله إلا الله","الله أكبر","محمد رسول الله"], ans:"أحد... أحد", exp:"كان بلال يصرخ أحد أحد أي الله واحد لن أشرك به شيئاً، بصوت لا يتغير." },
+      { q:"من أعتق بلالاً رضي الله عنه من العبودية؟", opts:["أبو بكر الصديق","عمر بن الخطاب","عثمان بن عفان","علي بن أبي طالب"], ans:"أبو بكر الصديق", exp:"أبو بكر رضي الله عنه اشترى بلالاً بسبع أواق من الذهب وأعتقه حباً لله." },
+      { q:"من كانت أول شهيدة في الإسلام؟", opts:["سمية رضي الله عنها","خديجة رضي الله عنها","أسماء بنت أبي بكر","فاطمة الزهراء"], ans:"سمية رضي الله عنها", exp:"سمية أم عمار بن ياسر هي أول شهيدة في الإسلام، قتلها أبو جهل بطعنة برمح." }
+    ]
+  },
+  { id:9, title:"الهجرة إلى الحبشة", subtitle:"الحلقة التاسعة", icon:"🕊️", color:"#6b5434",
+    description:"عدل النجاشي وتأثير القرآن الكريم",
+    lesson:"قول الحق مهما كانت النتيجة • العدل من أي إنسان محمود • القرآن يُغيّر القلوب",
+    questions:[
+      { q:"من كان الناطق باسم المسلمين في محكمة النجاشي؟", opts:["جعفر بن أبي طالب","أبو بكر الصديق","عمر بن الخطاب","عثمان بن عفان"], ans:"جعفر بن أبي طالب", exp:"جعفر رضي الله عنه تحدث بكلام بليغ جميل يصف الإسلام وأخلاقه أمام النجاشي." },
+      { q:"ماذا حدث لما تلا جعفر سورة مريم أمام النجاشي وأساقفته؟", opts:["بكوا جميعاً حتى ابتلت لحاهم","غضبوا وقرروا طردهم","سخروا منه","طلبوا المزيد دون مشاعر"], ans:"بكوا جميعاً حتى ابتلت لحاهم", exp:"بكى النجاشي حتى اخضلت لحيته وبكى أساقفته حتى أخضلوا مصاحفهم من تأثير القرآن." },
+      { q:"بماذا ردّ النجاشي على مطلب قريش بتسليم المسلمين؟", opts:["لا والله لا أسلمهم إليكم","سأنظر في الأمر","ترجع إليّ القبيلتان كل أسبوع","سأحكم بينهم بنفسي"], ans:"لا والله لا أسلمهم إليكم", exp:"قال النجاشي: انطلقا فلا والله لا أسلمهم إليكما، ورد إليهم هداياهم." }
+    ]
+  },
+  { id:10, title:"عام الحزن والطائف", subtitle:"الحلقة العاشرة", icon:"🌧️", color:"#8b5e3c",
+    description:"فقد الأحباء وصبر النبي ﷺ وحلمه مع أهل الطائف",
+    lesson:"الصبر على المصائب • الرحمة حتى مع من آذاك • التوكل على الله",
+    questions:[
+      { q:"لماذا سُميت تلك السنة بـ'عام الحزن'؟", opts:["لوفاة عم النبي ﷺ وزوجته خديجة","لاشتداد إيذاء قريش","لمرض كثير من المسلمين","لجفاف الأرض وشح الأمطار"], ans:"لوفاة عم النبي ﷺ وزوجته خديجة", exp:"فقد النبي ﷺ في أيام قليلة عمه الحامي أبا طالب وزوجته المواسية خديجة." },
+      { q:"ماذا قال النبي ﷺ لملك الجبال حين عرض عليه إهلاك أهل الطائف؟", opts:["بل أرجو أن يُسلم أبناؤهم","نعم دمّرهم جزاءً لما فعلوا","اتركهم فسيندمون","اسألهم الاعتذار أولاً"], ans:"بل أرجو أن يُسلم أبناؤهم", exp:"قال ﷺ: بل أرجو أن يُخرج الله من أصلابهم من يعبد الله وحده. هذا هو الحلم الحقيقي." },
+      { q:"ما مضمون دعاء النبي ﷺ المؤثر عند شجرة العنب في الطائف؟", opts:["إن لم يكن بك غضب علي فلا أبالي","اللهم انصرني على القوم الظالمين","اللهم أهلك هؤلاء","ربي أرحني من هذا الأذى"], ans:"إن لم يكن بك غضب علي فلا أبالي", exp:"دعا ﷺ متوكلاً: اللهم إليك أشكو ضعف قوتي... إن لم يكن بك غضب علي فلا أبالي." }
+    ]
+  },
+  { id:11, title:"الإسراء والمعراج", subtitle:"الحلقة الحادية عشرة", icon:"🌠", color:"#4a3a6e",
+    description:"رحلة السماوات وفرض الصلاة الخمس",
+    lesson:"عظمة النبي ﷺ • أهمية الصلاة • الإيمان بالغيب • قدرة الله المطلقة",
+    questions:[
+      { q:"ما اسم الدابة التي ركبها النبي ﷺ في رحلة الإسراء؟", opts:["البُراق","الحمار","الفرس","البعير"], ans:"البُراق", exp:"البراق دابة بيضاء أكبر من الحمار وأصغر من البغل، خطوها مدّ البصر." },
+      { q:"كم عدد الصلوات التي فُرضت في البداية قبل التخفيف؟", opts:["خمسون صلاة","عشرون صلاة","خمس عشرة صلاة","مائة صلاة"], ans:"خمسون صلاة", exp:"فرض الله خمسين صلاة ثم خُففت لخمس بشفاعة موسى عليه السلام للأمة." },
+      { q:"من صدّق النبي ﷺ فوراً في رحلة الإسراء دون تردد؟", opts:["أبو بكر الصديق","عمر بن الخطاب","علي بن أبي طالب","عثمان بن عفان"], ans:"أبو بكر الصديق", exp:"قال أبو بكر: إن كان قال ذلك فقد صدق! لذلك لُقّب بـ'الصديق'." }
+    ]
+  },
+  { id:12, title:"بيعة العقبة والهجرة النبوية", subtitle:"الحلقة الثانية عشرة", icon:"🌙", color:"#3a5a4e",
+    description:"الهجرة إلى المدينة وأحداث غار ثور",
+    lesson:"التوكل على الله مع الأخذ بالأسباب • الثقة بنصر الله • التضحية في سبيل الله",
+    questions:[
+      { q:"من نام في فراش النبي ﷺ ليلة الهجرة ليخدع المشركين؟", opts:["علي بن أبي طالب","أبو بكر الصديق","عمر بن الخطاب","حمزة بن عبد المطلب"], ans:"علي بن أبي طالب", exp:"علي رضي الله عنه ضحّى بنفسه ونام في فراش النبي ﷺ مغطياً ببرده." },
+      { q:"كم مدة بقاء النبي ﷺ وأبي بكر في غار ثور؟", opts:["ثلاثة أيام","يوم واحد","أسبوع كامل","عشرة أيام"], ans:"ثلاثة أيام", exp:"مكثا في غار ثور ثلاثة أيام بلياليها حتى هدأ الطلب وآمن الطريق." },
+      { q:"ما قول النبي ﷺ لأبي بكر حين وصل المشركون لباب الغار؟", opts:["ما ظنك باثنين الله ثالثهما؟","لا تخف سننجو بإذن الله","ادعُ الله أن ينجينا","سنخرج من الجانب الآخر"], ans:"ما ظنك باثنين الله ثالثهما؟", exp:"قال ﷺ: يا أبا بكر ما ظنك باثنين الله ثالثهما؟ لا تحزن إن الله معنا." }
+    ]
+  },
+  { id:13, title:"غزوة بدر الكبرى", subtitle:"الحلقة الثالثة عشرة", icon:"⚔️", color:"#5a3a2a",
+    description:"النصر العظيم بمدد الملائكة في شهر رمضان",
+    lesson:"النصر من عند الله لا من الكثرة • الشورى مهمة • الدعاء سلاح المؤمن",
+    questions:[
+      { q:"كم كان عدد المسلمين في بدر مقارنة بجيش قريش؟", opts:["313 مسلم مقابل 1000 من قريش","500 مسلم مقابل 500 من قريش","100 مسلم مقابل 300 من قريش","1000 مسلم مقابل 3000"], ans:"313 مسلم مقابل 1000 من قريش", exp:"كان المسلمون ثلاثمائة وبضعة عشر فقط مقابل ألف مقاتل من قريش مع مائة فرس." },
+      { q:"من قتل أبا جهل في غزوة بدر؟", opts:["معاذ ومعوذ ابنا عفراء","علي بن أبي طالب","حمزة بن عبد المطلب","عمر بن الخطاب"], ans:"معاذ ومعوذ ابنا عفراء", exp:"فتيان صغيران معاذ ومعوذ ابنا عفراء قتلا أبا جهل في غزوة بدر." },
+      { q:"كم بلغت خسائر المسلمين في بدر من الشهداء؟", opts:["أربعة عشر شهيداً","سبعون شهيداً","مائة شهيد","خمسة شهداء"], ans:"أربعة عشر شهيداً", exp:"لم يُستشهد من المسلمين إلا أربعة عشر رجلاً مقابل سبعين قتيلاً من المشركين." }
+    ]
+  },
+  { id:14, title:"أحد والخندق وفتح مكة", subtitle:"الحلقة الرابعة عشرة", icon:"🏰", color:"#4a5a3a",
+    description:"دروس الطاعة والتضحية والعفو عند المقدرة",
+    lesson:"طاعة القائد واجبة • الحكمة في القرارات • العفو عند المقدرة • التواضع في النصر",
+    questions:[
+      { q:"ما السبب الرئيسي لانقلاب معركة أحد على المسلمين؟", opts:["نزول الرماة من الجبل لجمع الغنائم","قلة عدد المسلمين","انسحاب المنافقين","ضعف أسلحة المسلمين"], ans:"نزول الرماة من الجبل لجمع الغنائم", exp:"خالف الرماة أمر النبي ﷺ الصريح ونزلوا من الجبل لجمع الغنائم فانقلبت المعركة." },
+      { q:"ماذا قال النبي ﷺ لأهل مكة عند فتحها؟", opts:["اذهبوا فأنتم الطلقاء","ستُجزون بما فعلتم","الغنائم لكم","ابقوا في بيوتكم"], ans:"اذهبوا فأنتم الطلقاء", exp:"عفا النبي ﷺ عن أهل مكة جميعاً رغم سنوات طويلة من الأذى. هذا هو الرحيم الرؤوف ﷺ." },
+      { q:"من اقترح حفر الخندق لحماية المدينة؟", opts:["سلمان الفارسي","أبو بكر الصديق","عمر بن الخطاب","علي بن أبي طالب"], ans:"سلمان الفارسي", exp:"سلمان الفارسي رضي الله عنه اقترح فكرة الخندق المستوحاة من الحروب الفارسية." }
+    ]
+  },
+  { id:15, title:"حجة الوداع ووفاة النبي ﷺ", subtitle:"الحلقة الخامسة عشرة", icon:"🌺", color:"#5a3a5a",
+    description:"الخطبة الخالدة وآخر أيام خير البشر ﷺ",
+    lesson:"كمال الدين • الوصية للأمة بكتاب الله • محبة النبي ﷺ في قلوبنا",
+    questions:[
+      { q:"كم مسلماً خرج مع النبي ﷺ في حجة الوداع؟", opts:["أكثر من مائة ألف مسلم","عشرة آلاف","خمسون ألفاً","ألف وأربعمائة"], ans:"أكثر من مائة ألف مسلم", exp:"خرج مع النبي ﷺ في حجة الوداع ما يزيد على مائة ألف مسلم." },
+      { q:"ما الذي قالته عائشة رضي الله عنها عن خُلق النبي ﷺ؟", opts:["كان خُلقه القرآن","كان خُلقه الإسلام","كان خُلقه التواضع","كان خُلقه الصبر"], ans:"كان خُلقه القرآن", exp:"قالت عائشة رضي الله عنها: كان خُلقه القرآن. أي أن حياته كانت تجسيداً حياً للقرآن." },
+      { q:"ما آخر ما تكلم به النبي ﷺ قبل وفاته؟", opts:["بل الرفيق الأعلى من الجنة","اللهم الرفيق الأعلى","أمتي أمتي","إلى الله وحده"], ans:"بل الرفيق الأعلى من الجنة", exp:"كان له خيار البقاء أو اللقاء فاختار اللقاء وقال: بل الرفيق الأعلى ثلاثاً ثم توفي ﷺ." }
+    ]
+  }
+];
+
+// ========== STATE ==========
+let state = {
+  scores: {}, // episodeId -> { correct, total, stars }
+  currentEpisode: null,
+  currentQIndex: 0,
+  currentAnswer: null,
+  answered: false,
+  correctCount: 0
+};
+
+// ========== RENDER EPISODES ==========
+function renderEpisodes() {
+  const grid = document.getElementById('episodesGrid');
+  grid.innerHTML = '';
+  let completedCount = 0;
+  let totalScore = 0;
+
+  EPISODES.forEach(ep => {
+    const sc = state.scores[ep.id];
+    if (sc) { completedCount++; totalScore += sc.correct; }
+
+    const stars = sc ? getStars(sc.correct, sc.total) : 0;
+    const starsHtml = '★'.repeat(stars) + '☆'.repeat(3 - stars);
+
+    const card = document.createElement('div');
+    card.className = 'episode-card' + (sc ? ' completed' : '');
+    card.innerHTML = `
+      <div class="ep-icon">${ep.icon}</div>
+      <div class="ep-num">${ep.subtitle}</div>
+      <div class="ep-title">${ep.title}</div>
+      <div class="ep-desc">${ep.description}</div>
+      <div class="ep-stars ${sc ? 'earned' : ''}">${starsHtml}</div>
+      <div class="ep-count">📝 ${ep.questions.length} أسئلة</div>
+    `;
+    card.onclick = () => startEpisode(ep.id);
+    grid.appendChild(card);
+  });
+
+  // Update progress
+  const pct = Math.round(completedCount / EPISODES.length * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `الحلقات المكتملة: ${completedCount} / ${EPISODES.length}`;
+
+  // Total stars
+  const maxScore = EPISODES.reduce((a, ep) => a + ep.questions.length, 0);
+  document.getElementById('totalScore').textContent = `⭐ ${totalScore} / ${maxScore}`;
+}
+
+function getStars(correct, total) {
+  const pct = correct / total;
+  if (pct === 1) return 3;
+  if (pct >= 0.6) return 2;
+  if (pct > 0) return 1;
+  return 0;
+}
+
+// ========== START EPISODE ==========
+function startEpisode(id) {
+  state.currentEpisode = EPISODES.find(e => e.id === id);
+  state.currentQIndex = 0;
+  state.correctCount = 0;
+  showScreen('screenGame');
+  loadQuestion();
+}
+
+function loadQuestion() {
+  const ep = state.currentEpisode;
+  const q = ep.questions[state.currentQIndex];
+  state.currentAnswer = null;
+  state.answered = false;
+
+  document.getElementById('gameEpisodeSub').textContent = ep.subtitle;
+  document.getElementById('gameEpisodeTitle').textContent = ep.title + ' ' + ep.icon;
+  document.getElementById('questionCounter').textContent =
+    `السؤال ${state.currentQIndex + 1} من ${ep.questions.length}`;
+  document.getElementById('questionText').textContent = q.q;
+
+  // Reset drop zone
+  const dz = document.getElementById('dropZone');
+  dz.className = 'drag-answer-zone';
+  dz.innerHTML = `<span class="drop-label">إجابتك</span><span class="drop-placeholder" id="dropPlaceholder">🖱️ اسحب إجابتك وضعها هنا</span>`;
+
+  // Render options (shuffled)
+  const opts = [...q.opts].sort(() => Math.random() - 0.5);
+  const grid = document.getElementById('optionsGrid');
+  grid.innerHTML = '';
+  opts.forEach(opt => {
+    const chip = document.createElement('div');
+    chip.className = 'option-chip';
+    chip.textContent = opt;
+    chip.dataset.value = opt;
+    chip.draggable = true;
+    chip.addEventListener('dragstart', onDragStart);
+    chip.addEventListener('touchstart', onTouchStart, { passive: false });
+    grid.appendChild(chip);
+  });
+
+  // Drop zone events
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', onDrop);
+
+  // Reset feedback
+  const fb = document.getElementById('feedbackBox');
+  fb.style.display = 'none';
+  fb.className = 'feedback-box';
+
+  // Buttons
+  document.getElementById('btnCheck').disabled = true;
+  document.getElementById('btnNext').disabled = true;
+  document.getElementById('btnCheck').style.display = 'inline-flex';
+}
+
+// ========== DRAG & DROP ==========
+let dragValue = null;
+
+function onDragStart(e) {
+  dragValue = e.target.dataset.value;
+  e.target.classList.add('dragging');
+  setTimeout(() => e.target.classList.remove('dragging'), 0);
+}
+
+function onDrop(e) {
+  e.preventDefault();
+  const dz = document.getElementById('dropZone');
+  dz.classList.remove('drag-over');
+  if (!dragValue || state.answered) return;
+
+  // Unuse previously used if replaced
+  if (state.currentAnswer) {
+    document.querySelectorAll('.option-chip').forEach(c => {
+      if (c.dataset.value === state.currentAnswer) c.classList.remove('used');
+    });
+  }
+
+  state.currentAnswer = dragValue;
+  setDropZoneAnswer(dragValue);
+  dragValue = null;
+}
+
+function setDropZoneAnswer(val) {
+  const dz = document.getElementById('dropZone');
+  dz.classList.add('has-answer');
+  dz.innerHTML = `
+    <span class="drop-label">إجابتك</span>
+    <div class="answer-in-zone">
+      ${val}
+      <button class="remove-btn" onclick="removeAnswer()" title="إزالة">✕</button>
+    </div>
+  `;
+  // Mark used
+  document.querySelectorAll('.option-chip').forEach(c => {
+    if (c.dataset.value === val) c.classList.add('used');
+  });
+  document.getElementById('btnCheck').disabled = false;
+}
+
+function removeAnswer() {
+  if (state.answered) return;
+  document.querySelectorAll('.option-chip').forEach(c => {
+    if (c.dataset.value === state.currentAnswer) c.classList.remove('used');
+  });
+  state.currentAnswer = null;
+  const dz = document.getElementById('dropZone');
+  dz.className = 'drag-answer-zone';
+  dz.innerHTML = `<span class="drop-label">إجابتك</span><span class="drop-placeholder" id="dropPlaceholder">🖱️ اسحب إجابتك وضعها هنا</span>`;
+  document.getElementById('btnCheck').disabled = true;
+}
+
+// ========== TOUCH DRAG ==========
+let touchChip = null;
+let ghost = null;
+
+function onTouchStart(e) {
+  if (state.answered) return;
+  e.preventDefault();
+  touchChip = e.currentTarget;
+  const val = touchChip.dataset.value;
+  const rect = touchChip.getBoundingClientRect();
+
+  ghost = document.getElementById('touchGhost');
+  ghost.textContent = val;
+  ghost.style.display = 'block';
+  ghost.style.background = '#f5e8c8';
+  ghost.style.border = '2px solid #c4a25e';
+  ghost.style.borderRadius = '10px';
+  ghost.style.padding = '0.6rem 1.1rem';
+  ghost.style.fontFamily = 'Noto Naskh Arabic, serif';
+  ghost.style.fontSize = '0.95rem';
+  ghost.style.color = '#3a2a14';
+  ghost.style.whiteSpace = 'nowrap';
+
+  document.addEventListener('touchmove', onTouchMove, { passive: false });
+  document.addEventListener('touchend', onTouchEnd);
+}
+
+function onTouchMove(e) {
+  e.preventDefault();
+  const t = e.touches[0];
+  ghost.style.left = t.clientX + 'px';
+  ghost.style.top = t.clientY + 'px';
+
+  const dz = document.getElementById('dropZone');
+  const rect = dz.getBoundingClientRect();
+  if (t.clientX > rect.left && t.clientX < rect.right &&
+      t.clientY > rect.top && t.clientY < rect.bottom) {
+    dz.classList.add('drag-over');
+  } else {
+    dz.classList.remove('drag-over');
+  }
+}
+
+function onTouchEnd(e) {
+  document.removeEventListener('touchmove', onTouchMove);
+  document.removeEventListener('touchend', onTouchEnd);
+
+  ghost.style.display = 'none';
+  const dz = document.getElementById('dropZone');
+  dz.classList.remove('drag-over');
+
+  if (!touchChip || state.answered) return;
+
+  const t = e.changedTouches[0];
+  const rect = dz.getBoundingClientRect();
+  if (t.clientX > rect.left && t.clientX < rect.right &&
+      t.clientY > rect.top && t.clientY < rect.bottom) {
+    // Drop into zone
+    if (state.currentAnswer) {
+      document.querySelectorAll('.option-chip').forEach(c => {
+        if (c.dataset.value === state.currentAnswer) c.classList.remove('used');
+      });
+    }
+    state.currentAnswer = touchChip.dataset.value;
+    setDropZoneAnswer(state.currentAnswer);
+  }
+  touchChip = null;
+}
+
+// ========== CHECK ANSWER ==========
+function checkAnswer() {
+  if (!state.currentAnswer || state.answered) return;
+  state.answered = true;
+
+  const q = state.currentEpisode.questions[state.currentQIndex];
+  const isCorrect = state.currentAnswer === q.ans;
+
+  if (isCorrect) state.correctCount++;
+
+  // Style drop zone
+  const dz = document.getElementById('dropZone');
+  dz.classList.remove('has-answer');
+  dz.classList.add(isCorrect ? 'correct' : 'incorrect');
+
+  // Style chips
+  document.querySelectorAll('.option-chip').forEach(c => {
+    if (c.dataset.value === q.ans) c.classList.add('correct-option');
+    else if (c.dataset.value === state.currentAnswer && !isCorrect) c.classList.add('wrong-option');
+  });
+
+  // Feedback
+  const fb = document.getElementById('feedbackBox');
+  fb.style.display = 'block';
+  if (isCorrect) {
+    fb.className = 'feedback-box correct-fb';
+    document.getElementById('feedbackIcon').textContent = '✅';
+    document.getElementById('feedbackText').textContent = 'إجابة صحيحة! أحسنت!';
+    document.getElementById('feedbackExp').textContent = q.exp;
+    launchConfetti();
+  } else {
+    fb.className = 'feedback-box incorrect-fb';
+    document.getElementById('feedbackIcon').textContent = '❌';
+    document.getElementById('feedbackText').textContent = `الإجابة الصحيحة: ${q.ans}`;
+    document.getElementById('feedbackExp').textContent = q.exp;
+  }
+
+  document.getElementById('btnCheck').disabled = true;
+  document.getElementById('btnNext').disabled = false;
+
+  // Last question
+  const isLast = state.currentQIndex >= state.currentEpisode.questions.length - 1;
+  if (isLast) {
+    document.getElementById('btnNext').textContent = 'عرض النتيجة 🏆';
+  }
+}
+
+function nextQuestion() {
+  const isLast = state.currentQIndex >= state.currentEpisode.questions.length - 1;
+  if (isLast) {
+    showResult();
+  } else {
+    state.currentQIndex++;
+    // Animate
+    const card = document.getElementById('questionCard');
+    card.style.opacity = '0';
+    setTimeout(() => {
+      loadQuestion();
+      card.style.opacity = '1';
+    }, 200);
+  }
+}
+
+// ========== RESULT ==========
+function showResult() {
+  const ep = state.currentEpisode;
+  const correct = state.correctCount;
+  const total = ep.questions.length;
+  const stars = getStars(correct, total);
+  const pct = Math.round(correct / total * 100);
+
+  state.scores[ep.id] = { correct, total, stars };
+
+  let trophy, message;
+  if (pct === 100) { trophy = '🏆'; message = 'ممتاز! إجابات صحيحة كاملة! أنت بطل السيرة النبوية!'; }
+  else if (pct >= 80) { trophy = '🥇'; message = 'رائع! استوعبت معظم الحلقة بشكل ممتاز!'; }
+  else if (pct >= 60) { trophy = '🥈'; message = 'جيد! تذكّر النقاط التي أخطأت فيها وراجعها.'; }
+  else { trophy = '📖'; message = 'استمع للحلقة مرة أخرى وحاول مجدداً. أنت قادر!'; }
+
+  document.getElementById('resultTrophy').textContent = trophy;
+  document.getElementById('resultTitle').textContent = ep.title;
+  document.getElementById('resultScore').textContent = `${correct} / ${total}`;
+
+  let starsHtml = '';
+  for (let i = 0; i < 3; i++) {
+    starsHtml += `<span class="star-pop" style="animation-delay:${i * 0.15}s">${i < stars ? '★' : '☆'}</span>`;
+  }
+  document.getElementById('resultStars').innerHTML = starsHtml;
+  document.getElementById('resultMessage').textContent = message;
+  document.getElementById('resultLesson').innerHTML = `
+    <strong>💡 الدروس المستفادة من الحلقة:</strong><br>${ep.lesson}
+  `;
+
+  showScreen('screenResult');
+  renderEpisodes();
+}
+
+function retryEpisode() {
+  startEpisode(state.currentEpisode.id);
+}
+
+function goToEpisodes() {
+  showScreen('screenEpisodes');
+  renderEpisodes();
+}
+
+// ========== UTILITIES ==========
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ========== CONFETTI ==========
+function launchConfetti() {
+  const container = document.getElementById('confettiContainer');
+  const colors = ['#c4a25e','#e8d49e','#8b7355','#f5e8c8','#d4af37','#a0844a'];
+  for (let i = 0; i < 30; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + 'vw';
+    piece.style.top = '-10px';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    piece.style.animationDelay = Math.random() * 0.8 + 's';
+    piece.style.animationDuration = (Math.random() * 0.8 + 1) + 's';
+    container.appendChild(piece);
+    setTimeout(() => piece.remove(), 2000);
+  }
+}
+
+// ========== INIT ==========
+renderEpisodes();
+</script>
+</body>
+</html>
